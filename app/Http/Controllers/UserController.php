@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Models\Product;
 
-class ProductController extends Controller
+class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,9 +15,9 @@ class ProductController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {   
-        $products = Product::all();
-        return view('pages.product.products', ['products' => $products]);
+    {
+        $users = User::all();
+        return view('pages.user.users', ['users' => $users ])->render();
     }
 
     /**
@@ -26,7 +27,7 @@ class ProductController extends Controller
      */
     public function create()
     {
-        return view('pages.product.product-create');
+        //
     }
 
     /**
@@ -36,29 +37,8 @@ class ProductController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {   
-        $this->validate($request,
-            [
-                'name' => 'required',
-                'price' => 'required',  
-                'description' => 'required',
-                'quantity' => 'required',
-                'image' => 'required'
-            ],
-            [
-                'name.required' => 'No Name',
-                'price.required' => 'No Price',
-                'description.required' => 'No Description',
-                'quantity.required' => 'No Quantity',
-                'image.required' => 'No Image',
-            ]
-        );
-        $product = $request->all();
-        $check = Product::create($product);
-        if($check){
-            return back()->with('thongbao', "Success");
-        }else return back()->with('thongbao', "Error");
-       
+    {
+        //
     }
 
     /**
@@ -68,8 +48,9 @@ class ProductController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id)
-    {
-        //
+    {   
+        $products = Product::where('user_id', $id)->get();
+        return view('pages.user.user-show-products', ['products' => $products])->render();;
     }
 
     /**
@@ -80,7 +61,8 @@ class ProductController extends Controller
      */
     public function edit($id)
     {
-        //
+        $user = User::find($id);
+        return view('pages.user.user-update', ['user' => $user])->render();
     }
 
     /**
@@ -91,8 +73,24 @@ class ProductController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
-    {
-        //
+    {   
+        $this->validate($request,
+            [
+                'name' => 'required',
+                'email' => 'required',
+                'birthday' => 'required',
+            ],
+            [
+                'name.required' => 'No Name',
+                'email.required' => 'No Email',
+                'birthday.required' => 'No Birthday',
+            ]
+        );
+        $user = $request->all();
+        $check = User::find($id)->update($user);
+        if($user){
+            return redirect()->back()->with('notification', 'Update user success');
+        }else  return redirect()->back()->with('notification', 'Update user error');
     }
 
     /**
@@ -102,7 +100,11 @@ class ProductController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
-    {
-        
+    {   
+        $check = User::find($id)->delete();
+        if($check){
+            return back()->with('notification', 'Delete user success');
+        }else  return back()->with('notification', 'Delete user error');
+       
     }
 }

@@ -7,10 +7,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Carbon\Carbon;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -21,6 +23,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'birthday',
+        'gender',
     ];
 
     /**
@@ -41,4 +45,27 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function getAge($birthday)
+    {
+        $now = Carbon::now();
+        $age = $now->diff($birthday)->y;
+        switch ($age) {
+            case $age < 6:
+                return 'Mẫu giáo';
+            case $age < 12:
+                return 'Tiểu học';
+            case $age <= 18;
+                return 'THPT';
+            default:
+                return 'ĐH';
+        };
+        
+    }
+    public function getGender($gender)
+    {
+        if($gender == 1){
+            return 'male';
+        }else return 'female';
+    }
 }
